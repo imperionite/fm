@@ -1,0 +1,16 @@
+@import './variables';
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-main !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.8;
+  font-weight: 400;
+  letter-spacing: 0.013m;
+  margin: 0;
+  min-height: 100vh;
+}
