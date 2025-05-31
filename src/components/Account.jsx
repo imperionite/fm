@@ -12,7 +12,6 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
-  Grid,
 } from "@mui/material";
 import { useMutation, QueryCache, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
@@ -21,7 +20,11 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../services/hooks";
 
-import { resendEmailConfirmation, logout, deactivateUser } from "../services/http";
+import {
+  resendEmailConfirmation,
+  logout,
+  deactivateUser,
+} from "../services/http";
 import { jwtAtom, expAtom, userProfileAtom } from "../services/atoms";
 
 const Loader = lazy(() => import("./Loader"));
@@ -96,7 +99,7 @@ const Account = () => {
   const deactivateUserMutation = useMutation({
     mutationFn: () => deactivateUser(profileData?.username),
     onSuccess: () => {
-      toast.success('Account deactivated');
+      toast.success("Account deactivated");
       queryClient.clear();
       resetJwt();
       resetExp();

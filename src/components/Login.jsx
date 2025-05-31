@@ -22,7 +22,7 @@ import * as yup from "yup";
 import { useGoogleLogin } from "@react-oauth/google";
 
 import { login, googleLogin } from "../services/http";
-import { userKeys } from "../services/queryKeyFactory";
+import { userKeys, serviceKeys } from "../services/queryKeyFactory";
 import { jwtAtom, expAtom } from "../services/atoms";
 import { useUserProfile } from "../services/hooks";
 const Loader = lazy(() => import("./Loader"));
@@ -48,6 +48,7 @@ const Login = () => {
     mutationFn: login,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: serviceKeys.all });
       const decoded = jwtDecode(data.access);
 
       setJwt({ access: data?.access, refresh: data?.refresh });
@@ -67,6 +68,7 @@ const Login = () => {
     mutationFn: googleLogin,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: serviceKeys.all });
       const decoded = jwtDecode(data.access);
 
       setJwt({ access: data?.access, refresh: data?.refresh });

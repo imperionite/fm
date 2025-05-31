@@ -14,7 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { sanitize } from "isomorphic-dompurify";
 import { jwtDecode } from "jwt-decode";
@@ -22,7 +22,7 @@ import * as yup from "yup";
 import { useGoogleLogin } from "@react-oauth/google";
 
 import { signup, googleLogin } from "../services/http";
-import { userKeys } from "../services/queryKeyFactory";
+import { userKeys, serviceKeys } from "../services/queryKeyFactory";
 import { jwtAtom, expAtom } from "../services/atoms";
 import { useUserProfile } from "../services/hooks";
 const Loader = lazy(() => import("./Loader"));
@@ -51,6 +51,7 @@ const Signup = () => {
     mutationFn: signup,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: serviceKeys.all });
       const decoded = jwtDecode(data.access);
 
       setJwt({ access: data?.access, refresh: data?.refresh });
@@ -69,6 +70,7 @@ const Signup = () => {
     mutationFn: googleLogin,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: serviceKeys.all });
       const decoded = jwtDecode(data.access);
 
       setJwt({ access: data?.access, refresh: data?.refresh });
@@ -142,9 +144,10 @@ const Signup = () => {
         px: 2,
       }}
     >
- 
       <Typography variant="h6" component="h6" gutterBottom>
-        <Link href={'/'} underline="none">FinMark By Imperionite</Link>
+        <Link href={"/"} underline="none">
+          FinMark By Imperionite
+        </Link>
       </Typography>
       <Box
         sx={{

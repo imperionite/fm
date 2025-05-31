@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { userKeys } from "./queryKeyFactory";
 import { getUserProfile } from "./http";
+import { api } from "./http";
 
 export const useUserProfile = (accessToken) => {
   return useQuery({
@@ -10,5 +11,28 @@ export const useUserProfile = (accessToken) => {
     staleTime: 5 * 60 * 1000, // optional: cache data for 5 minutes
     retry: 1, // optional: retry once on failure
     enabled: !!accessToken, // enable only if auth accessToken is truthy
+  });
+}
+
+// Fetch all services
+export const useServices = () => {
+  return useQuery({
+    queryKey: ['services'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/services');
+      return data;
+    },
+  });
+};
+
+// Fetch service by ID
+export const useServiceById = (id) => {
+  return useQuery({
+    queryKey: ['service', id],
+    queryFn: async () => {
+      const { data } = await api.get(`/api/services/${id}`);
+      return data;
+    },
+    enabled: !!id, // only run if ID exists
   });
 };

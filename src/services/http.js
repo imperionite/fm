@@ -2,10 +2,22 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import qs from "qs";
 
-const baseURL = import.meta.env.VITE_BASE_URL;
+// For Django/DRF
+const baseURL = import.meta.env.VITE_BASE_URL_CORE;
+
+const baseURLService = import.meta.env.VITE_BASE_URL_SERVICE;
 
 const http = axios.create({
   baseURL: baseURL,
+  withCredentials: true,
+  timeout: 100000,
+});
+
+export const api = axios.create({
+  baseURL: baseURLService,
+  headers: {
+    "Content-Type": "application/json",
+  },
   withCredentials: true,
   timeout: 100000,
 });
@@ -109,7 +121,7 @@ http.interceptors.response.use(
   }
 );
 
-// API functions
+// API functions (Django/DRF)
 const login = async (credentials) => {
   const response = await http.post("/api/users/auth/login/", credentials);
   return response.data;

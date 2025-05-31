@@ -8,6 +8,9 @@ const Signup = lazy(() => import("./Signup"));
 const Login = lazy(() => import("./Login"));
 const Account = lazy(() => import("./Account"));
 const Home = lazy(() => import("./Home"));
+const ServiceListPage = lazy(() => import("./ServiceListPage"));
+const ServiceDetailPage = lazy(() => import("./ServiceDetailPage"));
+
 const NotFound = lazy(() => import("./404"));
 
 const RouterList = () => {
@@ -28,6 +31,9 @@ const RouterList = () => {
         path="/account"
         element={jwt.access !== "" ? <Account /> : <Navigate to="/login" />}
       />
+      <Route path="/services" element={<ServiceListPage />} />
+      <Route path="/services/:id" element={<ServiceDetailPage />} />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
