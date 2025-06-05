@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import RouterList from './components/RouterList';
 
-import './styles/_App.scss';
 const App = () => {
   const location = useLocation();
   const excludeHeaderRoutes = ['/login', '/signup'];

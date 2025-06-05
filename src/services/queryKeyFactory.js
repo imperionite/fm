@@ -14,3 +14,12 @@ export const serviceKeys = {
   details: () => [...serviceKeys.all, "detail"],
   detail: (id) => [...serviceKeys.details(), id],
 };
+
+export const cartKeys = {
+  all: ["cart"],
+  lists: () => [...cartKeys.all, "list"],
+  list: (filters) => [...cartKeys.lists(), { filters }],
+  details: () => [...cartKeys.all, "detail"],
+  detail: (id) => [...cartKeys.details(), id],
+  userCart: () => [...cartKeys.all, "userCart"],
+};

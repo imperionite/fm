@@ -1,5 +1,6 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useServiceById } from "../services/hooks";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { useAtomValue } from "jotai";
+import { toast } from "react-hot-toast";
 import {
   Box,
   Typography,
@@ -13,6 +14,9 @@ import {
   Button,
   Container,
 } from "@mui/material";
+
+import { useUserProfile, useServiceById } from "../services/hooks";
+import { jwtAtom } from "../services/atoms";
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -34,6 +38,18 @@ export default function ServiceDetail() {
   };
 
   const { data, isLoading, isError } = useServiceById(id);
+
+  const jwt = useAtomValue(jwtAtom);
+  const { data: profileData } = useUserProfile(jwt?.access);
+  const userEmailVerified = profileData?.email_verified;
+
+  const notifyToConfirm = () => {
+    toast(
+      <span>
+        Confirm your email in <Link to={"/account"}>Account page</Link>
+      </span>
+    );
+  };
 
   if (isLoading) return <CircularProgress />;
   if (isError) return <Alert severity="error">Service not found</Alert>;
@@ -116,6 +132,19 @@ export default function ServiceDetail() {
             </Stack>
           </>
         )}
+
+        {/**************** For REVISION *****************/}
+        <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
+          {userEmailVerified ? (
+            <Button variant="outlined" size="small">
+              Subscribe
+            </Button>
+          ) : (
+            <Button variant="contained" onClick={notifyToConfirm}>
+              Subscribe
+            </Button>
+          )}
+        </Stack>
 
         {/* Back to List Button */}
         <Box mt={4}>

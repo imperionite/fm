@@ -7,12 +7,14 @@ const baseURL = import.meta.env.VITE_BASE_URL_CORE;
 
 const baseURLService = import.meta.env.VITE_BASE_URL_SERVICE;
 
+// For DRF
 const http = axios.create({
   baseURL: baseURL,
   withCredentials: true,
   timeout: 100000,
 });
 
+// For Express
 export const api = axios.create({
   baseURL: baseURLService,
   headers: {
@@ -179,6 +181,39 @@ const deactivateUser = async (username) => {
   return response?.data;
 };
 
+// Fetch Cart Items
+const fetchCart = async () => {
+  try {
+    const response = await http.get("/api/cart/");
+    return response.data;
+  } catch (error) {
+    console.error("Fetch cart error:", error);
+    throw error;
+  }
+};
+
+// Add Item to Cart
+const addToCart = async (serviceId) => {
+  try {
+    const response = await http.post("/api/cart/", { service_id: serviceId });
+    return response.data;
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    throw error;
+  }
+};
+
+// Remove Item from Cart
+const removeFromCart = async (serviceId) => {
+  try {
+    const response = await http.delete(`/api/cart/${serviceId}/`);
+    return response.data;
+  } catch (error) {
+    console.error("Remove from cart error:", error);
+    throw error;
+  }
+};
+
 export {
   login,
   signup,
@@ -189,4 +224,7 @@ export {
   logout,
   getUserProfile,
   deactivateUser,
+  fetchCart,
+  addToCart,
+  removeFromCart,
 };

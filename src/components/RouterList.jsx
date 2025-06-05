@@ -10,6 +10,7 @@ const Account = lazy(() => import("./Account"));
 const Home = lazy(() => import("./Home"));
 const ServiceListPage = lazy(() => import("./ServiceListPage"));
 const ServiceDetailPage = lazy(() => import("./ServiceDetailPage"));
+const Cart = lazy(() => import("./Cart"));
 
 const NotFound = lazy(() => import("./404"));
 
@@ -33,6 +34,10 @@ const RouterList = () => {
       />
       <Route path="/services" element={<ServiceListPage />} />
       <Route path="/services/:id" element={<ServiceDetailPage />} />
+      <Route
+        path="/cart"
+        element={jwt.access !== "" ? <Cart /> : <Navigate to="/login" />}
+      />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

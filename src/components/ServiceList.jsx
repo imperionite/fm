@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 import {
   Grid,
   Card,
@@ -11,9 +12,14 @@ import {
   Stack,
   Pagination,
   Paper,
+  Button,
 } from "@mui/material";
 import { toast } from "react-hot-toast";
 import { api } from "../services/http";
+import { useUserProfile } from "../services/hooks";
+import { addToCart } from "../services/http";
+import { jwtAtom } from "../services/atoms";
+import { cartKeys, serviceKeys, userKeys } from "../services/queryKeyFactory";
 
 const fetchServices = async (params) => {
   const { data } = await api.get("/api/services", { params });
@@ -22,15 +28,35 @@ const fetchServices = async (params) => {
 const Loader = lazy(() => import("./Loader"));
 
 export default function ServiceList() {
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get("category");
   const industry = searchParams.get("industry");
   const page = parseInt(searchParams.get("page") || "1");
+  const jwt = useAtomValue(jwtAtom);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["services", category, industry, page],
+    queryKey: ["services", category, industry, page], // Query key as an object/array
     queryFn: () => fetchServices({ category, industry, page, limit: 9 }),
-    keepPreviousData: true,
+    keepPreviousData: true, // to maintain data between page changes
+  });
+
+  const { data: profileData } = useUserProfile(jwt?.access);
+  const userEmailVerified = profileData?.email_verified;
+
+  // Mutation for adding to cart
+  const { mutate: addItemToCart } = useMutation({
+    mutationFn: addToCart,
+    onSuccess: () => {
+      toast.success("Service added to your cart!");
+      queryClient.invalidateQueries({ queryKey: cartKeys.all });
+      queryClient.invalidateQueries({ queryKey: serviceKeys.all });
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
+    onError: (error) => {
+      toast.error("Error adding item to cart");
+      console.error("Error adding item to cart:", error);
+    },
   });
 
   const handlePageChange = (_, value) => {
@@ -53,10 +79,18 @@ export default function ServiceList() {
     return colors[label] || "default";
   };
 
+  const notifyToConfirm = () => {
+    toast(
+      <span>
+        Confirm your email in <Link to={"/account"}>Account page</Link>
+      </span>
+    );
+  };
+
   if (isLoading) return <Loader />;
 
   if (!isLoading && data?.data.length === 0) {
-    toast.info("No services found matching your criteria.");
+    toast.error("No services found matching your criteria.");
   }
 
   if (isError) toast.error("Failed to load services. Please try again later.");
@@ -93,7 +127,7 @@ export default function ServiceList() {
       {!isLoading && data?.data.length > 0 && (
         <Grid container spacing={3} aria-live="polite">
           {data.data.map((service) => (
-            <Grid item xs={12} sm={6} md={4} key={service._id}>
+            <Grid size={{ sm: 12, md: 6 }} key={service._id}>
               <Card
                 sx={{
                   height: "100%",
@@ -152,6 +186,32 @@ export default function ServiceList() {
                       color={getChipColor(service.industry)}
                       aria-label={`Industry: ${service.industry}`}
                     />
+                  </Stack>
+                  {/* user subscribe to the service */}
+                  <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
+                    {/* Check if the user is authenticated (has JWT) */}
+                    {jwt?.access && (
+                      // Check if the user's email is verified
+                      <div>
+                        {userEmailVerified ? (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => addItemToCart(service._id)} // Add to cart function
+                          >
+                            Subscribe
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            onClick={notifyToConfirm} // Notify the user to confirm their email
+                          >
+                            Subscribe
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </Stack>
                 </CardContent>
               </Card>

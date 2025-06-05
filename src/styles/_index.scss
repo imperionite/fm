@@ -1,11 +1,8 @@
-@import './variables';
-
 html {
   box-sizing: border-box;
 }
 
 body {
-  font-family: $font-main !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.8;
