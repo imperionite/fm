@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -14,16 +14,20 @@ import {
   Badge,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import { Link } from "react-router-dom";
 import { useAtomValue } from "jotai";
-import { jwtAtom } from "../services/atoms"; 
+import { jwtAtom } from "../services/atoms";
+import { useCartFetch } from "../services/hooks";
 
-function Header({ cartItemCount = 0 }) {
+function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const jwt = useAtomValue(jwtAtom);
-
   const isAuthenticated = jwt?.access && jwt.access !== "";
+
+  const { data: cartData } = useCartFetch(jwt?.access);
+
+  const cartItemCount = cartData?.items?.length || 0;
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -51,7 +55,7 @@ function Header({ cartItemCount = 0 }) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="sticky" elevation={4}>
         <Toolbar>
           {/* Hamburger menu for mobile */}
           <IconButton
@@ -71,7 +75,9 @@ function Header({ cartItemCount = 0 }) {
           </Typography>
 
           {/* Desktop nav buttons */}
-          <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+          <Box
+            sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}
+          >
             {navItems.map((item) => (
               <Button
                 key={item}
@@ -84,17 +90,21 @@ function Header({ cartItemCount = 0 }) {
               </Button>
             ))}
 
-            {/* Cart icon only if authenticated */}
+            {/* Cart icon with badge */}
             {isAuthenticated && (
               <IconButton
                 color="inherit"
                 component={Link}
                 to="/cart"
                 sx={{ ml: 2 }}
-                aria-label="order cart"
+                aria-label={`Cart with ${cartItemCount} items`}
               >
-                <Badge badgeContent={cartItemCount} color="secondary">
-                  <ShoppingCartIcon />
+                <Badge
+                  badgeContent={cartItemCount}
+                  color="secondary"
+                  showZero={false}
+                >
+                  <WorkOutlineIcon />
                 </Badge>
               </IconButton>
             )}
@@ -126,6 +136,7 @@ function Header({ cartItemCount = 0 }) {
             </ListItem>
           ))}
 
+          {/* Mobile drawer cart item */}
           {isAuthenticated && (
             <ListItem disablePadding>
               <ListItemButton
@@ -134,7 +145,15 @@ function Header({ cartItemCount = 0 }) {
                 to="/cart"
                 onClick={toggleDrawer(false)}
               >
-                <ShoppingCartIcon sx={{ mr: 1 }} />
+                <Badge
+                  badgeContent={cartItemCount}
+                  color="secondary"
+                  showZero={false}
+                  overlap="circular"
+                  sx={{ mr: 1 }}
+                >
+                  <WorkOutlineIcon />
+                </Badge>
                 <ListItemText primary="Cart" />
               </ListItemButton>
             </ListItem>

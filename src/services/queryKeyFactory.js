@@ -22,4 +22,13 @@ export const cartKeys = {
   details: () => [...cartKeys.all, "detail"],
   detail: (id) => [...cartKeys.details(), id],
   userCart: () => [...cartKeys.all, "userCart"],
+
+};
+export const orderKeys = {
+  all: ["cart"],
+  lists: () => [...orderKeys.all, "list"],
+  list: (filters) => [...orderKeys.lists(), { filters }],
+  details: () => [...orderKeys.all, "detail"],
+  detail: (id) => [...orderKeys.details(), id],
+  fetchOrders: () => [...orderKeys.all, "fetchOrders"],
 };

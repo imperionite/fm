@@ -214,6 +214,42 @@ const removeFromCart = async (serviceId) => {
   }
 };
 
+// checkout
+const checkoutCart = async () => {
+  try {
+    const response = await http.post("/api/orders/checkout/", {});
+    console.log("Order successful:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Checkout failed:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+const fetchOrders = async () => {
+  try {
+    const response = await http.get("/api/orders/");
+    //console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Fetch orders failed:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+const fetchOrderById = async (id) => {
+  try {
+    const response = await http.get(`/api/orders/${id}/`);
+    return response.data;
+  } catch (error) {
+    console.error("Fetch order failed:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export {
   login,
   signup,
@@ -227,4 +263,7 @@ export {
   fetchCart,
   addToCart,
   removeFromCart,
+  checkoutCart,
+  fetchOrders,
+  fetchOrderById,
 };

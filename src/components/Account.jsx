@@ -3,16 +3,19 @@ import {
   Box,
   Button,
   Typography,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
   TableRow,
   Paper,
   Snackbar,
   Alert,
   CircularProgress,
+  Stack,
 } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+
 import { useMutation, QueryCache, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { useResetAtom } from "jotai/utils";
@@ -29,6 +32,17 @@ import { jwtAtom, expAtom, userProfileAtom } from "../services/atoms";
 
 const Loader = lazy(() => import("./Loader"));
 
+const ProfileField = ({ label, value }) => (
+  <Stack direction="row" justifyContent="space-between" alignItems="center">
+    <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+      {label}
+    </Typography>
+    <Typography variant="body1" fontWeight={500}>
+      {value}
+    </Typography>
+  </Stack>
+);
+
 const Account = () => {
   const queryClient = useQueryClient();
   const jwt = useAtomValue(jwtAtom);
@@ -40,7 +54,6 @@ const Account = () => {
   const resetExp = useResetAtom(expAtom);
   const resetUser = useResetAtom(userProfileAtom);
 
-  // Snackbar state for feedback
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -49,7 +62,6 @@ const Account = () => {
 
   const navigate = useNavigate();
 
-  // Mutation to resend email confirmation
   const resendEmailMutation = useMutation({
     mutationFn: (email) => resendEmailConfirmation({ email }),
     onSuccess: () => {
@@ -68,7 +80,6 @@ const Account = () => {
     },
   });
 
-  // Mutation for logout
   const logoutMutation = useMutation({
     mutationFn: () => logout(jwt.refresh),
     onSuccess: (data) => {
@@ -79,8 +90,6 @@ const Account = () => {
         message: "Logged out successfully.",
         severity: "success",
       });
-      // Optionally, you can redirect or reload page here:
-      // window.location.href = "/login";
       resetJwt();
       resetExp();
       resetUser();
@@ -136,129 +145,152 @@ const Account = () => {
     return <Loader />;
   if (error) return <p>Error loading profile</p>;
 
-  // console.log(profileData);
-
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        User Profile
+    <Box sx={{ maxWidth: 800, mx: "auto", p: 4 }}>
+      <Typography variant="h4" gutterBottom fontWeight={600}>
+        Account Overview
       </Typography>
 
-      <TableContainer component={Paper} sx={{ mb: 4 }}>
-        <Table aria-label="user profile table">
-          <TableBody>
-            <TableRow>
-              <TableCell variant="head">Username</TableCell>
-              <TableCell>{profileData?.username}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell variant="head">Email</TableCell>
-              <TableCell>
-                {userEmail}{" "}
-                {userEmailVerified ? (
-                  <Typography
-                    component="span"
-                    color="success.main"
-                    sx={{ ml: 1, fontWeight: "bold" }}
-                  >
-                    (Verified)
-                  </Typography>
-                ) : (
-                  <Typography
-                    component="span"
-                    color="warning.main"
-                    sx={{ ml: 1, fontWeight: "bold" }}
-                  >
-                    (Unverified)
-                  </Typography>
-                )}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell variant="head">User ID</TableCell>
-              <TableCell>{profileData?.pk}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell variant="head">Status</TableCell>
-              <TableCell>
-                {profileData?.is_staff ? "Role: Staff" : "Regular User"}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell variant="head">Date Joined</TableCell>
-              <TableCell>
-                {new Date(profileData?.date_joined).toLocaleString("en-US", {
-                  dateStyle: "long",
-                  timeStyle: "short",
-                })}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell variant="head">Last Login</TableCell>
-              <TableCell>
-                {new Date(profileData?.last_login).toLocaleString("en-US", {
-                  dateStyle: "long",
-                  timeStyle: "short",
-                })}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Paper elevation={2} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+        <Typography variant="h6" fontWeight={600} gutterBottom>
+          Profile Details
+        </Typography>
 
-      <TableContainer component={Paper} sx={{ mb: 4 }}>
-        <Table aria-label="user profile table">
-          <TableBody>
-            <TableRow>
-              <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
-                Actions
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={userEmailVerified || resendEmailMutation.isLoading}
-                  onClick={handleSendConfirmation}
-                  sx={{ mr: 2 }}
+        <Stack spacing={2}>
+          <ProfileField label="Username" value={profileData?.username} />
+          <ProfileField
+            label="Email"
+            value={
+              <>
+                {profileData?.email}
+                <Typography
+                  component="span"
+                  sx={{
+                    ml: 1,
+                    fontWeight: "bold",
+                    color: profileData?.email_verified
+                      ? "success.main"
+                      : "warning.main",
+                  }}
                 >
-                  {resendEmailMutation.isLoading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    "Send Email Confirmation"
-                  )}
-                </Button>
+                  ({profileData?.email_verified ? "Verified" : "Unverified"})
+                </Typography>
+              </>
+            }
+          />
+          <ProfileField label="User ID" value={profileData?.pk} />
+          <ProfileField
+            label="Status"
+            value={profileData?.is_staff ? "Staff" : "Regular User"}
+          />
+          <ProfileField
+            label="Date Joined"
+            value={new Date(profileData?.date_joined).toLocaleString("en-US", {
+              dateStyle: "long",
+              timeStyle: "short",
+            })}
+          />
+          <ProfileField
+            label="Last Login"
+            value={new Date(profileData?.last_login).toLocaleString("en-US", {
+              dateStyle: "long",
+              timeStyle: "short",
+            })}
+          />
+        </Stack>
+      </Paper>
+      <Paper elevation={1} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+          Subscription
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          View your subscription history.
+        </Typography>
+        <Button
+          variant="outlined"
+          color="info"
+          startIcon={<ReceiptLongIcon />}
+          href="/orders"
+          sx={{ mt: 2 }}
+        >
+          View Subscription History
+        </Button>
+      </Paper>
 
-                <Button
-                  variant="contained"
-                  color="warning"
-                  onClick={() => logoutMutation.mutate()}
-                  disabled={logoutMutation.isLoading}
-                  sx={{ mr: 2 }}
-                >
-                  {logoutMutation.isLoading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    "Logout"
-                  )}
-                </Button>
+      {/* --- Session Controls --- */}
+      <Paper elevation={1} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+          Session Controls
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Use this to end your current session securely.
+        </Typography>
 
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={handleDeactivateUser}
-                  disabled={deactivateUserMutation.isLoading}
-                >
-                  {deactivateUserMutation.isLoading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    "Deactivate Account"
-                  )}
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+        <Button
+          variant="text"
+          color="warning"
+          onClick={() => logoutMutation.mutate()}
+          disabled={logoutMutation.isLoading}
+          startIcon={<LogoutIcon />}
+        >
+          {logoutMutation.isLoading ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : (
+            "Logout"
+          )}
+        </Button>
+      </Paper>
+
+      {/* --- Account Management --- */}
+      <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
+        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+          Account Management
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Manage your account settings and identity verification.
+        </Typography>
+
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          justifyContent="flex-start"
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={userEmailVerified || resendEmailMutation.isLoading}
+            onClick={handleSendConfirmation}
+            startIcon={<MailOutlineIcon />}
+          >
+            {resendEmailMutation.isLoading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Send Email Confirmation"
+            )}
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleDeactivateUser}
+            disabled={deactivateUserMutation.isLoading}
+            startIcon={<DeleteForeverIcon />}
+          >
+            {deactivateUserMutation.isLoading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Deactivate Account"
+            )}
+          </Button>
+        </Stack>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 2, display: "block" }}
+        >
+          Deactivating your account will require reactivation through support.
+        </Typography>
+      </Paper>
 
       <Snackbar
         open={snackbar.open}
@@ -277,5 +309,14 @@ const Account = () => {
     </Box>
   );
 };
+
+const StyledRow = ({ label, value }) => (
+  <TableRow>
+    <TableCell variant="head" sx={{ fontWeight: 500, color: "text.secondary" }}>
+      {label}
+    </TableCell>
+    <TableCell>{value}</TableCell>
+  </TableRow>
+);
 
 export default Account;

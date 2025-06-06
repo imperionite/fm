@@ -18,3 +18,5 @@ export const userProfileAtom = atom({
 });
 
 export const expAtom = atomWithStorage("expAtom", 0);
+
+export const cartAtom = atom([]);

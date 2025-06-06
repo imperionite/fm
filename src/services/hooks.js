@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { userKeys, cartKeys } from "./queryKeyFactory";
-import { getUserProfile, fetchCart } from "./http";
+import { userKeys, cartKeys, orderKeys } from "./queryKeyFactory";
+import { getUserProfile, fetchCart, fetchOrders, fetchOrderById } from "./http";
 import { api } from "./http";
 
 export const useUserProfile = (accessToken) => {
@@ -40,11 +40,30 @@ export const useServiceById = (id) => {
 
 export const useCartFetch = (accessToken) => {
   return useQuery({
-    queryKey: cartKeys.detail("userCart"), // defined related key for invallidate or caching
-    queryFn: fetchCart, // your async function that fetches user profile
-    // enabled, // enables data fetching on condition
-    staleTime: 5 * 60 * 1000, // optional: cache data for 5 minutes
-    retry: 1, // optional: retry once on failure
-    enabled: !!accessToken, // enable only if auth accessToken is truthy
+    queryKey: cartKeys.detail("userCart"),
+    queryFn: fetchCart,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+    enabled: !!accessToken,
+  });
+};
+
+export const useFetchOrders = (accessToken) => {
+  return useQuery({
+    queryKey: orderKeys.detail("fetchOrders"),
+    queryFn: fetchOrders,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+    enabled: !!accessToken,
+  });
+};
+
+export const useFetchOrderById = (id, accessToken) => {
+  return useQuery({
+    queryKey: orderKeys.detail(id),
+    queryFn: () => fetchOrderById(id),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+    enabled: !!id && !!accessToken,
   });
 };

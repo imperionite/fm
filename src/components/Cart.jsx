@@ -9,11 +9,11 @@ import {
   Button,
 } from "@mui/material";
 import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAtomValue } from "jotai";
 
 import { useCartFetch } from "../services/hooks";
-import { removeFromCart } from "../services/http";
+import { removeFromCart, checkoutCart } from "../services/http";
 import { jwtAtom } from "../services/atoms";
 import { cartKeys, serviceKeys } from "../services/queryKeyFactory";
 
@@ -22,6 +22,7 @@ const Loader = lazy(() => import("./Loader"));
 export default function Cart() {
   const queryClient = useQueryClient();
   const jwt = useAtomValue(jwtAtom);
+  const navigate = useNavigate();
   const { data: cart, isLoading, isError } = useCartFetch(jwt?.access);
 
   // Mutation for adding to cart
@@ -36,6 +37,22 @@ export default function Cart() {
     onError: (error) => {
       toast.error("Error removing item from cart");
       console.error("Error removing item from cart:", error);
+    },
+  });
+
+  // Mutation for checkout
+  const { mutate: checkout, isPending: isCheckingOut } = useMutation({
+    mutationFn: checkoutCart,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: cartKeys.all });
+      queryClient.invalidateQueries({ queryKey: serviceKeys.all });
+      toast.success("Order placed successfully!");
+      navigate(`/orders/${data.id}`);
+      console.log(data);
+    },
+    onError: (error) => {
+      console.error("Checkout failed:", error);
+      toast.error("Checkout failed. Please try again.");
     },
   });
 
@@ -54,7 +71,7 @@ export default function Cart() {
       ) : (
         <Grid container spacing={3}>
           {cart?.items.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.id}>
+            <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4 }}>
               <Card>
                 <CardContent>
                   <Typography variant="h6">{item?.service_name}</Typography>
@@ -77,12 +94,11 @@ export default function Cart() {
       <Box mt={3}>
         <Button
           variant="contained"
-          component={Link}
-          to="/checkout"
           size="large"
-          disabled={cart?.items?.length === 0}
+          disabled={cart?.items?.length === 0 || isCheckingOut}
+          onClick={() => checkout()}
         >
-          Proceed to Checkout
+          {isCheckingOut ? "Processing..." : "Proceed to Checkout"}
         </Button>
       </Box>
     </Box>

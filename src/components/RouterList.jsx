@@ -11,6 +11,8 @@ const Home = lazy(() => import("./Home"));
 const ServiceListPage = lazy(() => import("./ServiceListPage"));
 const ServiceDetailPage = lazy(() => import("./ServiceDetailPage"));
 const Cart = lazy(() => import("./Cart"));
+const OrderList = lazy(() => import("./OrderList"));
+const OrderDetail = lazy(() => import("./OrderDetail"));
 
 const NotFound = lazy(() => import("./404"));
 
@@ -34,10 +36,10 @@ const RouterList = () => {
       />
       <Route path="/services" element={<ServiceListPage />} />
       <Route path="/services/:id" element={<ServiceDetailPage />} />
-      <Route
-        path="/cart"
-        element={jwt.access !== "" ? <Cart /> : <Navigate to="/login" />}
-      />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/orders" element={<OrderList />} />
+      <Route path="/orders/:id" element={<OrderDetail />} />
+      
 
       <Route path="*" element={<NotFound />} />
     </Routes>

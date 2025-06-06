@@ -54,7 +54,7 @@ export default function ServiceList() {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
     },
     onError: (error) => {
-      toast.error("Error adding item to cart");
+      toast.error(error.message);
       console.error("Error adding item to cart:", error);
     },
   });
