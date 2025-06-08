@@ -1,34 +1,34 @@
 export const userKeys = {
   all: ["users"],
-  lists: () => [...userKeys.all, "list"],
-  list: (filters) => [...userKeys.lists(), { filters }],
-  details: () => [...userKeys.all, "detail"],
-  detail: (id) => [...userKeys.details(), id],
-  profile: () => [...userKeys.all, "profile"],
-};
-
-export const serviceKeys = {
-  all: ["services"],
-  lists: () => [...serviceKeys.all, "list"],
-  list: (filters) => [...serviceKeys.lists(), { filters }],
-  details: () => [...serviceKeys.all, "detail"],
-  detail: (id) => [...serviceKeys.details(), id],
+  detail: (id) => [...userKeys.all, "detail", id],
 };
 
 export const cartKeys = {
   all: ["cart"],
-  lists: () => [...cartKeys.all, "list"],
-  list: (filters) => [...cartKeys.lists(), { filters }],
-  details: () => [...cartKeys.all, "detail"],
-  detail: (id) => [...cartKeys.details(), id],
-  userCart: () => [...cartKeys.all, "userCart"],
-
+  // Consider making this user-specific as well if multiple users might use the same client
+  detail: (userSessionIdentifier) => [
+    ...cartKeys.all,
+    "detail",
+    userSessionIdentifier,
+  ],
 };
+
+export const serviceKeys = {
+  all: ["services"],
+  detail: (id) => [...serviceKeys.all, "detail", id],
+};
+
 export const orderKeys = {
-  all: ["cart"],
-  lists: () => [...orderKeys.all, "list"],
-  list: (filters) => [...orderKeys.lists(), { filters }],
-  details: () => [...orderKeys.all, "detail"],
-  detail: (id) => [...orderKeys.details(), id],
-  fetchOrders: () => [...orderKeys.all, "fetchOrders"],
+  // IMPORTANT: Add userSessionIdentifier to the query key for the list of orders.
+  // This ensures TanStack Query caches orders separately for each authenticated user.
+  list: (userSessionIdentifier) => ["orders", "list", userSessionIdentifier],
+  // IMPORTANT: Also add userSessionIdentifier to the query key for a single order detail.
+  // This prevents potential cache collisions and ensures data integrity if order IDs
+  // could theoretically overlap across different users (though less likely in your setup, it's good practice).
+  detail: (orderId, userSessionIdentifier) => [
+    "orders",
+    "detail",
+    orderId,
+    userSessionIdentifier,
+  ],
 };

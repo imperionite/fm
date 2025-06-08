@@ -1,4 +1,4 @@
-import React, { lazy, useState } from "react";
+import { lazy, useState } from "react";
 import {
   Box,
   Button,
@@ -15,6 +15,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import { Link as RouterLink } from "react-router-dom";
 
 import { useMutation, QueryCache, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
@@ -210,8 +211,16 @@ const Account = () => {
           variant="outlined"
           color="info"
           startIcon={<ReceiptLongIcon />}
-          href="/orders"
-          sx={{ mt: 2 }}
+          component={RouterLink}
+          to="/orders"
+          sx={{
+            mt: 2,
+            textTransform: "none",
+            fontWeight: 600,
+            "&:hover": {
+              backgroundColor: "rgba(59, 130, 246, 0.08)", // subtle blue hover
+            },
+          }}
         >
           View Subscription History
         </Button>

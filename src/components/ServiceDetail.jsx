@@ -1,11 +1,11 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { lazy } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAtomValue } from "jotai";
 import { toast } from "react-hot-toast";
 import {
   Box,
   Typography,
-  CircularProgress,
-  Alert,
   Chip,
   Stack,
   Divider,
@@ -15,12 +15,33 @@ import {
   Container,
 } from "@mui/material";
 
-import { useUserProfile, useServiceById } from "../services/hooks";
+import { useServiceById } from "../services/hooks";
 import { jwtAtom } from "../services/atoms";
+import { addToCart } from "../services/http";
+import { cartKeys, serviceKeys, userKeys, orderKeys } from "../services/queryKeyFactory";
+
+const Loader = lazy(() => import("./Loader"));
 
 export default function ServiceDetail() {
+  const queryClient = useQueryClient();
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Mutation for adding to cart
+  const { mutate: addItemToCart } = useMutation({
+    mutationFn: addToCart,
+    onSuccess: () => {
+      toast.success("Service added to your cart!");
+      queryClient.invalidateQueries({ queryKey: cartKeys.all });
+      queryClient.invalidateQueries({ queryKey: serviceKeys.all });
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: orderKeys.all });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+      console.error("Error adding item to cart:", error);
+    },
+  });
 
   // Helper to pick chip color based on label (optional)
   const getChipColor = (label) => {
@@ -37,22 +58,12 @@ export default function ServiceDetail() {
     return colors[label] || "default";
   };
 
-  const { data, isLoading, isError } = useServiceById(id);
+  const { data, isLoading, isError, error } = useServiceById(id);
 
   const jwt = useAtomValue(jwtAtom);
-  const { data: profileData } = useUserProfile(jwt?.access);
-  const userEmailVerified = profileData?.email_verified;
 
-  const notifyToConfirm = () => {
-    toast(
-      <span>
-        Confirm your email in <Link to={"/account"}>Account page</Link>
-      </span>
-    );
-  };
-
-  if (isLoading) return <CircularProgress />;
-  if (isError) return <Alert severity="error">Service not found</Alert>;
+  if (isLoading) return <Loader />;
+  if (isError) return toast.error(error);
 
   return (
     <Container maxWidth="md">
@@ -132,17 +143,18 @@ export default function ServiceDetail() {
             </Stack>
           </>
         )}
-
-        {/**************** For REVISION *****************/}
         <Stack direction="row" spacing={1} mt={2} flexWrap="wrap">
-          {userEmailVerified ? (
-            <Button variant="outlined" size="small">
-              Subscribe
-            </Button>
-          ) : (
-            <Button variant="contained" onClick={notifyToConfirm}>
-              Subscribe
-            </Button>
+          {/* Check if the user is authenticated (has JWT) */}
+          {jwt?.access && (
+            <div>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => addItemToCart(data._id)} // Add to cart function
+              >
+                Subscribe
+              </Button>
+            </div>
           )}
         </Stack>
 

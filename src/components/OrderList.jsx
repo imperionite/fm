@@ -13,7 +13,6 @@ import { Link } from "react-router-dom";
 import { useAtomValue } from "jotai";
 import { useFetchOrders } from "../services/hooks";
 import { jwtAtom } from "../services/atoms";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 
 const Loader = lazy(() => import("./Loader"));
@@ -70,7 +69,7 @@ export default function OrderList() {
             No orders placed yet.
           </Typography>
           <Typography variant="body2" sx={{ maxWidth: 360, textAlign: "center" }}>
-            Browse our products and start your subscription today!
+            Browse our services and start your subscription today!
           </Typography>
         </Box>
       ) : (

@@ -250,6 +250,38 @@ const fetchOrderById = async (id) => {
   }
 };
 
+const payOrder = async (orderId, paymentData) => {
+  // paymentData should be { method: "card", reference_id: "txn_abc123" }
+  try {
+    const response = await http.post(`/api/orders/${orderId}/pay/`, paymentData);
+    console.log(`Payment successful for Order ${orderId}:`, response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Payment for Order ${orderId} failed:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// to update order status (for cancellation or other status changes)
+const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    const response = await http.patch(`/api/orders/${orderId}/update_status/`, { status: newStatus });
+    console.log(`Order ${orderId} status updated to ${newStatus}:`, response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to update status for Order ${orderId} to ${newStatus}:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// API Functions (Express)
+
+const fetchServices = async (params) => {
+  const { data } = await api.get("/api/services", { params });
+  return data;
+};
+
+
 export {
   login,
   signup,
@@ -266,4 +298,7 @@ export {
   checkoutCart,
   fetchOrders,
   fetchOrderById,
+  payOrder, 
+  fetchServices,
+  updateOrderStatus
 };
