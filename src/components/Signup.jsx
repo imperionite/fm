@@ -24,11 +24,9 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { signup, googleLogin } from "../services/http";
 import { userKeys, serviceKeys } from "../services/queryKeyFactory";
 import { jwtAtom, expAtom } from "../services/atoms";
-import { useUserProfile } from "../services/hooks";
 const Loader = lazy(() => import("./Loader"));
 
 const Signup = () => {
-  const { data: profileData } = useUserProfile();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const setJwt = useSetAtom(jwtAtom);
@@ -74,7 +72,7 @@ const Signup = () => {
       const decoded = jwtDecode(data.access);
 
       setJwt({ access: data?.access, refresh: data?.refresh });
-      toast.success(`Hi user ${profileData?.email}`);
+      toast.success('Google Signup success!');
       navigate("/account");
       if (typeof decoded.exp === "number") setExp(decoded.exp);
     },

@@ -15,7 +15,7 @@ import { useAtomValue } from "jotai";
 import { useCartFetch } from "../services/hooks";
 import { removeFromCart, checkoutCart } from "../services/http";
 import { jwtAtom } from "../services/atoms";
-import { cartKeys, serviceKeys } from "../services/queryKeyFactory";
+import { cartKeys, serviceKeys, orderKeys } from "../services/queryKeyFactory";
 
 const Loader = lazy(() => import("./Loader"));
 
@@ -44,15 +44,16 @@ export default function Cart() {
   // Mutation for checkout
   const { mutate: checkout, isPending: isCheckingOut } = useMutation({
     mutationFn: checkoutCart,
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       // Remove the specific cart query from cache after checkout
       queryClient.removeQueries({ queryKey: cartKeys.detail(jwt?.access) });
+      queryClient.invalidateQueries({
+        queryKey: orderKeys.list(jwt?.access),
+      });
       queryClient.invalidateQueries({ queryKey: cartKeys.all });
       queryClient.invalidateQueries({ queryKey: serviceKeys.all });
-      await refetch(); // Explicitly refetch the cart data
-      //
       toast.success("Order placed successfully!");
-      navigate(`/orders/${data.id}`); // Navigate after all cache updates and refetch
+      navigate("/orders"); // Navigate after all cache updates and refetch
       //console.log(data);
     },
     onError: (error) => {

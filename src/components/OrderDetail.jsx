@@ -53,8 +53,9 @@ export default function OrderDetail() {
         queryClient.invalidateQueries({
           queryKey: orderKeys.list(jwt?.access),
         });
+        queryClient.invalidateQueries({ queryKey: orderKeys.all });
         toast.success(
-          `Payment successful for Order #${updatedOrder.id}! Status: ${updatedOrder.status}.`
+          `Payment successful for Order #${updatedOrder.id}! Please check your email for subscription notification.`
         );
         setShowPaymentOptions(false);
         setPaymentMethod("");

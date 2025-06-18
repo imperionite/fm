@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Google as GoogleIcon } from "@mui/icons-material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSetAtom, useAtomValue } from "jotai";
+import { useSetAtom } from "jotai";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
@@ -24,12 +24,9 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { login, googleLogin } from "../services/http";
 import { userKeys, serviceKeys } from "../services/queryKeyFactory";
 import { jwtAtom, expAtom } from "../services/atoms";
-import { useUserProfile } from "../services/hooks";
 const Loader = lazy(() => import("./Loader"));
 
 const Login = () => {
-  const jwt = useAtomValue(jwtAtom);
-  const { data: profileData } = useUserProfile(jwt?.access);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const setJwt = useSetAtom(jwtAtom);
@@ -72,7 +69,7 @@ const Login = () => {
       const decoded = jwtDecode(data.access);
 
       setJwt({ access: data?.access, refresh: data?.refresh });
-      toast.success(`Hi user ${profileData?.email}`);
+      toast.success('Google login success!');
       navigate("/account");
       if (typeof decoded.exp === "number") setExp(decoded.exp);
     },
@@ -96,7 +93,6 @@ const Login = () => {
     redirect_uri: import.meta.env.VITE_REDIRECT_URI,
   });
 
-  // React Hook Form setup
   const {
     register,
     reset,
