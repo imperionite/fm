@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 
-// Ensure all necessary key factories are imported
 import { userKeys, cartKeys, orderKeys, serviceKeys } from "./queryKeyFactory";
 import {
   getUserProfile,
@@ -13,7 +12,7 @@ import { api } from "./http";
 
 export const useUserProfile = (accessToken) => {
   return useQuery({
-    queryKey: userKeys.detail("profile"), // This is generally fine as user profile is unique
+    queryKey: userKeys.detail("profile"), // fine as user profile is unique
     queryFn: getUserProfile,
     staleTime: 5 * 60 * 1000,
     retry: 1,
@@ -48,7 +47,7 @@ export const useServiceById = (id) => {
 export const useCartFetch = (accessToken) => {
   return useQuery({
     // Use the accessToken as the userSessionIdentifier for cart data
-    queryKey: cartKeys.detail(accessToken), // Now uses the user's access token
+    queryKey: cartKeys.detail(accessToken), // Then uses the user's access token
     queryFn: fetchCart,
     staleTime: 5 * 60 * 1000,
     retry: 1,
@@ -58,7 +57,7 @@ export const useCartFetch = (accessToken) => {
 
 export const useFetchOrders = (accessToken) => {
   return useQuery({
-    // IMPORTANT: Pass the accessToken to the query key for unique user caching
+    // Pass the accessToken to the query key for unique user caching
     queryKey: orderKeys.list(accessToken),
     queryFn: fetchOrders,
     staleTime: 5 * 60 * 1000,
@@ -70,7 +69,7 @@ export const useFetchOrders = (accessToken) => {
 
 export const useFetchOrderById = (id, accessToken) => {
   return useQuery({
-    // IMPORTANT: Pass both the order ID and accessToken for unique user-specific order detail caching
+    // Pass both the order ID and accessToken for unique user-specific order detail caching
     queryKey: orderKeys.detail(id, accessToken),
     queryFn: () => fetchOrderById(id),
     staleTime: 5 * 60 * 1000,
