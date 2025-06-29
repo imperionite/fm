@@ -14,7 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { sanitize } from "isomorphic-dompurify";
 import { jwtDecode } from "jwt-decode";
@@ -143,7 +143,7 @@ const Signup = () => {
       }}
     >
       <Typography variant="h6" component="h6" gutterBottom>
-        <Link href={"/"} underline="none">
+        <Link component={RouterLink} to="/" underline="none">
           FinMark By Imperionite
         </Link>
       </Typography>
@@ -241,7 +241,7 @@ const Signup = () => {
 
         <Stack direction="row" spacing={1} justifyContent="center" mt={2}>
           <Typography>Already have an account?</Typography>
-          <Link href="/login" underline="hover">
+          <Link component={RouterLink} to="/login" underline="hover">
             Login
           </Link>
         </Stack>
