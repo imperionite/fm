@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +27,7 @@ import { jwtAtom, expAtom } from "../services/atoms";
 
 const Login = () => {
   const queryClient = useQueryClient();
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const navigate = useNavigate();
   const setJwt = useSetAtom(jwtAtom);
   const setExp = useSetAtom(expAtom);
@@ -40,7 +42,14 @@ const Login = () => {
 
   // Mutation hook for login
   const mutation = useMutation({
-    mutationFn: login,
+    mutationFn: async (data) => {
+      const response = await login(data);
+      return response;
+    },
+    onMutate: () => {
+      console.log("Mutation started");
+      setIsButtonDisabled(true);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       queryClient.invalidateQueries({ queryKey: serviceKeys.all });
@@ -56,11 +65,18 @@ const Login = () => {
       toast.error(`Login failed: ${error.message}`);
       navigate("/login");
     },
+    onSettled: () => {
+      setIsButtonDisabled(false); // Re-enable the button when mutation is settled
+    },
   });
 
   // Mutation hook for Google login
   const googleLoginMutation = useMutation({
     mutationFn: googleLogin,
+    onMutate: () => {
+      console.log("Google login started");
+      setIsButtonDisabled(true); // Disable the button during Google login mutation
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       queryClient.invalidateQueries({ queryKey: serviceKeys.all });
@@ -74,6 +90,9 @@ const Login = () => {
     onError: (error) => {
       toast.error("Google login failed:", error);
       navigate("/login");
+    },
+    onSettled: () => {
+      setIsButtonDisabled(false); // Re-enable the button after Google login mutation
     },
   });
 
@@ -105,12 +124,12 @@ const Login = () => {
     },
   });
 
-  const onSubmit = (input) => {
+  const onSubmit = async (input) => {
     const sanitizedData = {
       email: sanitize(input.email),
       password: input.password,
     };
-    mutation.mutate(sanitizedData);
+    await mutation.mutateAsync(sanitizedData);
   };
 
   return (
@@ -173,12 +192,25 @@ const Login = () => {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 2, height: 40 }}
-            disabled={mutation.isLoading}
+            sx={{
+              mt: 2,
+              height: 40,
+              position: "relative", // Make sure the spinner can be positioned within the button
+            }}
+            disabled={isButtonDisabled || mutation.isLoading} // Disable the button during mutation
           >
             {mutation.isLoading ? (
               <>
-                <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
+                <CircularProgress
+                  size={20}
+                  sx={{
+                    color: "white",
+                    position: "absolute",
+                    left: "50%",
+                    top: "50%",
+                    transform: "translate(-50%, -50%)",
+                  }}
+                />
                 Logging in...
               </>
             ) : (
@@ -193,13 +225,26 @@ const Login = () => {
           startIcon={!googleLoginMutation.isLoading ? <GoogleIcon /> : null}
           fullWidth
           variant="outlined"
-          sx={{ mb: 2, height: 40 }}
+          sx={{
+            mb: 2,
+            height: 40,
+            position: "relative",
+          }}
           onClick={() => gLogin()}
-          disabled={googleLoginMutation.isLoading}
+          disabled={isButtonDisabled || googleLoginMutation.isLoading} // Disable Google button during loading
         >
           {googleLoginMutation.isLoading ? (
             <>
-              <CircularProgress size={20} sx={{ color: "inherit", mr: 1 }} />
+              <CircularProgress
+                size={20}
+                sx={{
+                  color: "inherit",
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              />
               Connecting...
             </>
           ) : (
