@@ -39,7 +39,7 @@ function Header() {
     setDrawerOpen(open);
   };
 
-  const navItemsUnauth = ["Home", "About", "Services", "Contact", "Login"];
+  const navItemsUnauth = ["Home", "About", "Services", "Contact", "Login", "Signup"];
   const navItemsAuth = ["Home", "About", "Services", "Contact", "Account"];
 
   const navRoutes = {
@@ -49,6 +49,7 @@ function Header() {
     Contact: "/contact",
     Login: "/login",
     Account: "/account",
+    Signup: "/signup"
   };
 
   const navItems = isAuthenticated ? navItemsAuth : navItemsUnauth;
