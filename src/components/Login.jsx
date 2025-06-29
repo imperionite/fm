@@ -27,7 +27,7 @@ import { jwtAtom, expAtom } from "../services/atoms";
 
 const Login = () => {
   const queryClient = useQueryClient();
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const setJwt = useSetAtom(jwtAtom);
   const setExp = useSetAtom(expAtom);
@@ -48,7 +48,7 @@ const Login = () => {
     },
     onMutate: () => {
       console.log("Mutation started");
-      setIsButtonDisabled(true);
+      setIsLoading(true);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
@@ -66,7 +66,7 @@ const Login = () => {
       navigate("/login");
     },
     onSettled: () => {
-      setIsButtonDisabled(false); // Re-enable the button when mutation is settled
+      setIsLoading(false); // Re-enable the button when mutation is settled
     },
   });
 
@@ -75,7 +75,7 @@ const Login = () => {
     mutationFn: googleLogin,
     onMutate: () => {
       console.log("Google login started");
-      setIsButtonDisabled(true); // Disable the button during Google login mutation
+      setIsLoading(true); // Disable the button during Google login mutation
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
@@ -92,7 +92,7 @@ const Login = () => {
       navigate("/login");
     },
     onSettled: () => {
-      setIsButtonDisabled(false); // Re-enable the button after Google login mutation
+      setIsLoading(false); // Re-enable the button after Google login mutation
     },
   });
 
@@ -197,9 +197,9 @@ const Login = () => {
               height: 40,
               position: "relative", // Make sure the spinner can be positioned within the button
             }}
-            disabled={isButtonDisabled || mutation.isLoading} // Disable the button during mutation
+            disabled={isLoading || mutation.isLoading} // Disable the button during mutation
           >
-            {mutation.isLoading ? (
+            {isLoading ? (
               <>
                 <CircularProgress
                   size={20}
@@ -222,7 +222,9 @@ const Login = () => {
         <Divider sx={{ my: 2 }}>or</Divider>
 
         <Button
-          startIcon={!googleLoginMutation.isLoading ? <GoogleIcon /> : null}
+          startIcon={
+            !googleLoginMutation.isLoading || !isLoading ? <GoogleIcon /> : null
+          }
           fullWidth
           variant="outlined"
           sx={{
@@ -231,9 +233,9 @@ const Login = () => {
             position: "relative",
           }}
           onClick={() => gLogin()}
-          disabled={isButtonDisabled || googleLoginMutation.isLoading} // Disable Google button during loading
+          disabled={isLoading || googleLoginMutation.isLoading} // Disable Google button during loading
         >
-          {googleLoginMutation.isLoading ? (
+          {googleLoginMutation.isLoading || isLoading ? (
             <>
               <CircularProgress
                 size={20}

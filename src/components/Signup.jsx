@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +27,7 @@ import { jwtAtom, expAtom } from "../services/atoms";
 
 const Signup = () => {
   const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const setJwt = useSetAtom(jwtAtom);
   const setExp = useSetAtom(expAtom);
@@ -44,7 +46,14 @@ const Signup = () => {
 
   // Mutation hook for signup
   const mutation = useMutation({
-    mutationFn: signup,
+    mutationFn: async (data) => {
+      const response = await signup(data);
+      return response;
+    },
+    onMutate: () => {
+      console.log("Mutation started");
+      setIsLoading(true);
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       queryClient.invalidateQueries({ queryKey: serviceKeys.all });
@@ -59,11 +68,18 @@ const Signup = () => {
     onError: (error) => {
       toast.error(`Login failed: ${error.message}`);
     },
+    onSettled: () => {
+      setIsLoading(false);
+    },
   });
 
   // Mutation hook for Google login as signup
   const googleLoginMutation = useMutation({
     mutationFn: googleLogin,
+    onMutate: () => {
+      console.log("Google login started");
+      setIsLoading(true); // Disable the button during Google login mutation
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.all });
       queryClient.invalidateQueries({ queryKey: serviceKeys.all });
@@ -76,6 +92,9 @@ const Signup = () => {
     },
     onError: (error) => {
       toast.error("Google signup failed:", error);
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -110,14 +129,14 @@ const Signup = () => {
     },
   });
 
-  const onSubmit = (input) => {
+  const onSubmit = async (input) => {
     const sanitizedData = {
       username: sanitize(input.username),
       email: sanitize(input.email),
       password1: input.password1,
       password2: input.password2,
     };
-    mutation.mutate(sanitizedData);
+    await mutation.mutateAsync(sanitizedData);
   };
 
   return (
@@ -202,9 +221,9 @@ const Signup = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 2, height: 40 }}
-            disabled={mutation.isLoading}
+            disabled={mutation.isLoading || isLoading}
           >
-            {mutation.isLoading ? (
+            {mutation.isLoading || isLoading ? (
               <>
                 <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
                 Signing up...
@@ -218,14 +237,14 @@ const Signup = () => {
         <Divider sx={{ my: 2 }}>or</Divider>
 
         <Button
-          startIcon={!googleLoginMutation.isLoading ? <GoogleIcon /> : null}
+          startIcon={!googleLoginMutation.isLoading || !isLoading ? <GoogleIcon /> : null}
           fullWidth
           variant="outlined"
           sx={{ mb: 2, height: 40 }}
           onClick={() => gLogin()}
-          disabled={googleLoginMutation.isLoading}
+          disabled={googleLoginMutation.isLoading || isLoading}
         >
-          {googleLoginMutation.isLoading ? (
+          {googleLoginMutation.isLoading || isLoading ? (
             <>
               <CircularProgress size={20} sx={{ color: "inherit", mr: 1 }} />
               Connecting...
