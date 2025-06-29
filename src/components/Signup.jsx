@@ -222,36 +222,30 @@ const Signup = () => {
             variant="contained"
             sx={{ mt: 2, height: 40 }}
             disabled={mutation.isLoading || isLoading}
+            loading={isLoading}
+            loadingPosition="start"
           >
-            {mutation.isLoading || isLoading ? (
-              <>
-                <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
-                Signing up...
-              </>
-            ) : (
-              "Signup"
-            )}
+            {mutation.isLoading || isLoading ? "Signing up..." : "Signup"}
           </Button>
         </form>
 
         <Divider sx={{ my: 2 }}>or</Divider>
 
         <Button
-          startIcon={!googleLoginMutation.isLoading || !isLoading ? <GoogleIcon /> : null}
+          startIcon={
+            !googleLoginMutation.isLoading || !isLoading ? <GoogleIcon /> : null
+          }
           fullWidth
           variant="outlined"
           sx={{ mb: 2, height: 40 }}
           onClick={() => gLogin()}
           disabled={googleLoginMutation.isLoading || isLoading}
+          loading={isLoading}
+          loadingPosition="start"
         >
-          {googleLoginMutation.isLoading || isLoading ? (
-            <>
-              <CircularProgress size={20} sx={{ color: "inherit", mr: 1 }} />
-              Connecting...
-            </>
-          ) : (
-            "Continue with Google"
-          )}
+          {googleLoginMutation.isLoading || isLoading
+            ? "Connecting..."
+            : "Continue with Google"}
         </Button>
 
         <Stack direction="row" spacing={1} justifyContent="center" mt={2}>

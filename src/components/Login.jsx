@@ -198,24 +198,10 @@ const Login = () => {
               position: "relative", // Make sure the spinner can be positioned within the button
             }}
             disabled={isLoading || mutation.isLoading} // Disable the button during mutation
+            loading={isLoading}
+            loadingPosition="start"
           >
-            {isLoading ? (
-              <>
-                <CircularProgress
-                  size={20}
-                  sx={{
-                    color: "white",
-                    position: "absolute",
-                    left: "50%",
-                    top: "50%",
-                    transform: "translate(-50%, -50%)",
-                  }}
-                />
-                Logging in...
-              </>
-            ) : (
-              "Login"
-            )}
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
         </form>
 
@@ -234,24 +220,12 @@ const Login = () => {
           }}
           onClick={() => gLogin()}
           disabled={isLoading || googleLoginMutation.isLoading} // Disable Google button during loading
+          loading={isLoading}
+          loadingPosition="start"
         >
-          {googleLoginMutation.isLoading || isLoading ? (
-            <>
-              <CircularProgress
-                size={20}
-                sx={{
-                  color: "inherit",
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  transform: "translate(-50%, -50%)",
-                }}
-              />
-              Connecting...
-            </>
-          ) : (
-            "Continue with Google"
-          )}
+          {googleLoginMutation.isLoading || isLoading
+            ? "Connecting..."
+            : "Continue with Google"}
         </Button>
 
         <Stack direction="row" spacing={2} justifyContent="center" mt={3}>
