@@ -1,4 +1,3 @@
-import { lazy } from "react";
 import {
   Box,
   Button,
@@ -24,7 +23,6 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { signup, googleLogin } from "../services/http";
 import { userKeys, serviceKeys } from "../services/queryKeyFactory";
 import { jwtAtom, expAtom } from "../services/atoms";
-const Loader = lazy(() => import("./Loader"));
 
 const Signup = () => {
   const queryClient = useQueryClient();
@@ -72,7 +70,7 @@ const Signup = () => {
       const decoded = jwtDecode(data.access);
 
       setJwt({ access: data?.access, refresh: data?.refresh });
-      toast.success('Google Signup success!');
+      toast.success("Google Signup success!");
       navigate("/account");
       if (typeof decoded.exp === "number") setExp(decoded.exp);
     },
@@ -121,14 +119,6 @@ const Signup = () => {
     };
     mutation.mutate(sanitizedData);
   };
-
-  if (
-    mutation.isLoading ||
-    mutation.isPending ||
-    googleLoginMutation.isLoading ||
-    googleLoginMutation.isPending
-  )
-    return <Loader />;
 
   return (
     <Box
@@ -211,11 +201,14 @@ const Signup = () => {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, height: 40 }}
             disabled={mutation.isLoading}
           >
             {mutation.isLoading ? (
-              <CircularProgress size={24} color="inherit" />
+              <>
+                <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
+                Signing up...
+              </>
             ) : (
               "Signup"
             )}
@@ -225,15 +218,18 @@ const Signup = () => {
         <Divider sx={{ my: 2 }}>or</Divider>
 
         <Button
-          startIcon={<GoogleIcon />}
+          startIcon={!googleLoginMutation.isLoading ? <GoogleIcon /> : null}
           fullWidth
           variant="outlined"
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, height: 40 }}
           onClick={() => gLogin()}
           disabled={googleLoginMutation.isLoading}
         >
           {googleLoginMutation.isLoading ? (
-            <CircularProgress size={24} color="inherit" />
+            <>
+              <CircularProgress size={20} sx={{ color: "inherit", mr: 1 }} />
+              Connecting...
+            </>
           ) : (
             "Continue with Google"
           )}

@@ -10,6 +10,8 @@ const Signup = lazy(() => import("./Signup"));
 const Login = lazy(() => import("./Login"));
 const Account = lazy(() => import("./Account"));
 const Home = lazy(() => import("./Home"));
+const About = lazy(() => import("./About"));
+const Contact = lazy(() => import("./Contact"));
 const ServiceListPage = lazy(() => import("./ServiceListPage"));
 const ServiceDetail = lazy(() => import("./ServiceDetail"));
 const Cart = lazy(() => import("./Cart"));
@@ -95,6 +97,8 @@ const RouterList = () => {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/services" element={<ServiceListPage />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
 

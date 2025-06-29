@@ -77,52 +77,88 @@ const Home = () => {
       <Box
         sx={{
           textAlign: "center",
-          mb: 10,
-          py: 6,
-          px: 2,
-          background: `linear-gradient(135deg, ${theme.palette.grey[900]}, ${theme.palette.grey[800]})`,
-          borderRadius: 2,
-          color: "#fff",
+          mb: 14,
+          py: { xs: 8, md: 12 },
+          px: 3,
+          background: `linear-gradient(145deg, ${theme.palette.grey[900]}, ${theme.palette.grey[800]})`,
+          borderRadius: 3,
+          color: "white",
+          boxShadow: 6,
         }}
       >
-        <Typography variant="h3" fontWeight="bold" gutterBottom>
+        <Typography variant="h2" fontWeight="bold" gutterBottom>
           FinMark by Imperionite
         </Typography>
         <Typography
-          variant="subtitle1"
-          sx={{ maxWidth: "700px", mx: "auto", color: "grey.300" }}
+          variant="h6"
+          sx={{ maxWidth: 720, mx: "auto", color: "grey.300" }}
         >
           Enterprise-grade financial and analytical services engineered for
           real-world business performance.
         </Typography>
-        <Button variant="contained" size="large" color="primary" sx={{ mt: 4 }} component={Link} to="/services">
+        <Button
+          variant="contained"
+          size="large"
+          color="primary"
+          sx={{ mt: 5, px: 5, py: 1.5, fontWeight: 600 }}
+          component={Link}
+          to="/services"
+        >
           View Service Plans
         </Button>
       </Box>
 
-      {/* Services */}
-      <Box sx={{ mb: 12 }}>
+      {/* Services Section */}
+      <Box sx={{ mb: 14 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           Core Services
         </Typography>
         <Divider sx={{ mb: 4 }} />
-        <Grid container spacing={4}>
+        <Grid
+          container
+          spacing={4}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)", // 2-column layout
+            gridTemplateRows: "repeat(2, 1fr)", // 2-row layout
+            gap: 4,
+          }}
+        >
           {services.map((service, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid item key={index}>
               <Paper
-                elevation={1}
+                elevation={2}
                 sx={{
-                  p: 3,
+                  p: 4,
                   height: "100%",
-                  backgroundColor: "#f8f9fa",
-                  borderLeft: `4px solid ${theme.palette.primary.main}`,
+                  backgroundColor: "#f9fafb",
+                  borderRadius: 3,
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-between",
-                  borderRadius: 2,
+                  alignItems: "center",
+                  textAlign: "center",
+                  transition: "all 0.3s ease",
+                  borderTop: `3px solid ${theme.palette.primary.main}`,
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: 4,
+                  },
                 }}
               >
-                <Box sx={{ mb: 2 }}>{service.icon}</Box>
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: 64,
+                    height: 64,
+                    bgcolor: "primary.light",
+                    borderRadius: "50%",
+                  }}
+                >
+                  {service.icon}
+                </Box>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
                   {service.title}
                 </Typography>
@@ -135,22 +171,36 @@ const Home = () => {
         </Grid>
       </Box>
 
-      {/* Clients */}
-      <Box sx={{ mb: 12 }}>
+      {/* Clients Section */}
+      <Box sx={{ mb: 14 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           Sectors We Serve
         </Typography>
         <Divider sx={{ mb: 4 }} />
-        <Grid container spacing={4}>
+        <Grid
+          container
+          spacing={4}
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)", // 2-column layout
+            gridTemplateRows: "repeat(2, 1fr)", // 2-row layout
+            gap: 4,
+          }}
+        >
           {clients.map((client, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid item key={index}>
               <Paper
-                elevation={0}
+                elevation={1}
                 sx={{
-                  p: 3,
+                  p: 4,
                   height: "100%",
-                  backgroundColor: "#f1f3f4",
-                  borderRadius: 2,
+                  borderRadius: 3,
+                  backgroundColor: "#ffffff",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+                  },
                 }}
               >
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
@@ -165,13 +215,13 @@ const Home = () => {
         </Grid>
       </Box>
 
-      {/* Final CTA */}
+      {/* CTA */}
       <Box
         sx={{
           textAlign: "center",
-          py: 6,
-          backgroundColor: "#e8eaed",
-          borderRadius: 2,
+          py: 10,
+          backgroundColor: "#f0f2f5",
+          borderRadius: 3,
         }}
       >
         <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -185,6 +235,16 @@ const Home = () => {
           variant="outlined"
           color="primary"
           size="large"
+          sx={{
+            fontWeight: 600,
+            px: 4,
+            py: 1.5,
+            borderWidth: 2,
+            "&:hover": {
+              backgroundColor: "primary.light",
+              borderColor: "primary.main",
+            },
+          }}
           component={Link}
           to="/signup"
         >
