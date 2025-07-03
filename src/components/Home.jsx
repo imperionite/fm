@@ -125,7 +125,7 @@ const Home = () => {
           }}
         >
           {services.map((service, index) => (
-            <Grid item key={index}>
+            <Grid key={index}>
               <Paper
                 elevation={2}
                 sx={{
@@ -188,7 +188,7 @@ const Home = () => {
           }}
         >
           {clients.map((client, index) => (
-            <Grid item key={index}>
+            <Grid key={index}>
               <Paper
                 elevation={1}
                 sx={{
