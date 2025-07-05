@@ -17,6 +17,7 @@ const ServiceDetail = lazy(() => import("./ServiceDetail"));
 const Cart = lazy(() => import("./Cart"));
 const OrderList = lazy(() => import("./OrderList"));
 const OrderDetail = lazy(() => import("./OrderDetail"));
+const EmailConfirmed = lazy(() => import("./EmailConfirmed"));
 const NotFound = lazy(() => import("./404"));
 
 const Loader = lazy(() => import("./Loader"));
@@ -101,6 +102,7 @@ const RouterList = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/services" element={<ServiceListPage />} />
         <Route path="/services/:id" element={<ServiceDetail />} />
+        <Route path="/email-confirmed" element={<EmailConfirmed />} />
 
         {/* Guest-only routes */}
         <Route
