@@ -1,6 +1,6 @@
 # fm
 
-Frontend service for the PT micro-service project.
+Client-side & API gateway for the PT micro-service project.
 
 ## Commands
 
